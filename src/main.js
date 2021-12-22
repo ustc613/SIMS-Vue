@@ -5,6 +5,7 @@ import App from './App.vue'
 import router from "./router"
 
 import '@arco-design/web-vue/dist/arco.css'
+import './assets/app.less'
 
 const app = createApp(App)
 app.use(ArcoVue)
