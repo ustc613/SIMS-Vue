@@ -47,12 +47,13 @@ const loginInfo = reactive({
   height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
 
   .login-container {
     background-color: white;
     padding: 24px 24px 0 24px;
     border-radius: 6px;
+    margin-top: 30vh;
 
     .login-user-switch {
       width: 100%;

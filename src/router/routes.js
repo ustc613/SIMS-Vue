@@ -1,6 +1,6 @@
 import Login from '../view/Login.vue'
-import Admin from '../view/Admin.vue'
-import Dashboard from '../view/admin/Dashboard.vue'
+import Console from '../view/Console.vue'
+import Dashboard from '../view/console/Dashboard.vue'
 
 export default [
     {
@@ -9,14 +9,14 @@ export default [
         component: Login,
     },
     {
-        path: '/admin',
+        path: '/console',
         meta: {
             requireAdmin: true,
         },
-        component: Admin,
+        component: Console,
         children: [
             {
-                path: 'dashboard',
+                path: '',
                 component: Dashboard,
             }
         ]
