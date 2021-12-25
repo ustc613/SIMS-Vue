@@ -44,9 +44,9 @@
             <IconCaretLeft v-else/>
           </a-button>
           <a-dropdown trigger="hover">
-            <a-button shape="round">用户名</a-button>
+            <a-button shape="round">{{ manager.name }}</a-button>
             <template #content>
-              <a-doption>退出登录</a-doption>
+              <a-doption @click="userLogout">退出登录</a-doption>
             </template>
           </a-dropdown>
         </a-row>
@@ -67,13 +67,29 @@
 <script setup>
 import { ref } from 'vue'
 import { useRouter } from "vue-router"
+import { logout } from "../common/api"
+import preference from "../common/preference"
 
 const collapsed = ref(false)
+const router = useRouter()
 
 const menuConfigs = [
   {
     text: '系统概览',
     route: 'SystemOverview',
+  },
+  {
+    text: '用户管理',
+    children: [
+      {
+        text: '学校管理员',
+        route: 'ManagerTable',
+      },
+      {
+        text: '新增学校管理员',
+        route: 'ManagerEditor',
+      }
+    ]
   },
   {
     text: '学校管理',
@@ -96,8 +112,21 @@ const menuConfigs = [
         route: 'StudentTable',
       },
       {
-        text: '导入学生',
+        text: '添加学生',
         route: 'StudentEditor',
+      }
+    ]
+  },
+  {
+    text: '课程管理',
+    children: [
+      {
+        text: '课程列表',
+        route: 'CourseTable',
+      },
+      {
+        text: '新增课程',
+        route: 'CourseEditor',
       }
     ]
   },
@@ -116,8 +145,7 @@ const menuConfigs = [
   }
 ]
 const breadcrumb = ref([ '系统概览' ])
-
-const router = useRouter()
+const manager = preference.get('manager')
 
 const onCollapse = () => {
   collapsed.value = !collapsed.value
@@ -139,6 +167,12 @@ const onClickMenuItem = (key) => {
     text,
   ]
 }
+
+const userLogout = async () => {
+  await logout({ role: 'manager' })
+  await router.replace({ name: 'login' })
+}
+
 </script>
 <style scoped lang="less">
 .console {
@@ -163,7 +197,7 @@ const onClickMenuItem = (key) => {
   }
 
   :deep(.arco-layout-header) {
-    height: 64px;
+    height: 48px;
     line-height: 64px;
     background: var(--color-bg-3);
   }
@@ -181,13 +215,15 @@ const onClickMenuItem = (key) => {
     font-weight: 400;
     font-size: 14px;
     background: var(--color-bg-3);
+    //background-color: whitesmoke;
+    padding: 12px;
   }
 
   :deep(.arco-layout-footer),
   :deep(.arco-layout-content) {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     color: var(--color-white);
     font-size: 16px;
     font-stretch: condensed;

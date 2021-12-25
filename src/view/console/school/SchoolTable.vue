@@ -1,13 +1,123 @@
 <template>
-<div class="school-table"></div>
+  <div class="school-table">
+    <a-collapse :default-active-key="['result']" :bordered="false">
+      <a-collapse-item header="条件查询" key="search">
+        <a-form layout="vertical" :model="form">
+          <a-form-item field="name" label="学校名称">
+            <a-input v-model="form.name" placeholder="学校名称..."/>
+          </a-form-item>
+          <a-form-item field="address" label="学校地址">
+            <a-input v-model="form.address" placeholder="请输入学校地址..."/>
+          </a-form-item>
+          <a-form-item content-class="search-btn">
+            <a-button type="primary" shape="round" size="mini" @click="search">查询</a-button>
+          </a-form-item>
+        </a-form>
+      </a-collapse-item>
+    </a-collapse>
+
+    <a-table
+        :bordered="true" :hoverable="true" :stripe="true"
+        :loading="loading" :show-header="true" page-position="bottom"
+        :row-selection="{
+          type: 'checkbox',
+          showCheckedAll: true
+        }"
+        :data="schoolData" row-key="id"
+    >
+      <template #columns>
+        <a-table-column v-for="col in columns" :title="col.title" :data-index="col.dataIndex"/>
+        <a-table-column title="操作" align="center">
+          <template #cell="{ record }">
+            <a-button type="text" size="mini" @click="tryUpdateSchool(record)">更新信息</a-button>
+          </template>
+        </a-table-column>
+      </template>
+    </a-table>
+
+    <a-modal v-model:visible="showUpdateModal" hide-cancel
+             :on-before-ok="toUpdateSchool">
+      <template #title>
+        更新学校信息
+      </template>
+      <div>
+        <SchoolEditor update-mode :form-data="schoolToUpdate" ref="schoolEditor"/>
+      </div>
+    </a-modal>
+  </div>
 </template>
 
-<script>
-export default {
-  name: "SchoolList"
+<script setup>
+
+import { onMounted, reactive, ref } from "vue"
+import { getAllSchool } from "../../../common/api"
+import SchoolEditor from "./SchoolEditor.vue"
+
+const columns = [
+  {
+    title: 'ID',
+    dataIndex: 'id',
+  },
+  {
+    title: '学校名称',
+    dataIndex: 'name',
+  },
+  {
+    title: '学校地址',
+    dataIndex: 'address',
+  }
+]
+const loading = ref(false)
+const form = reactive({
+  name: null,
+  address: null,
+})
+
+const showUpdateModal = ref(false)
+const schoolToUpdate = ref(null)
+
+const schoolData = ref([])
+const schoolEditor = ref(null)
+
+const fetchData = async () => {
+  loading.value = true
+  const res = await getAllSchool()
+  loading.value = false
+  return res.rows
+}
+
+const search = async () => {
+  const schools = await fetchData()
+  const result = []
+  schools.forEach(school => {
+    if (form.name && school.name.indexOf(form.name) === -1) {
+      return
+    }
+    if (form.address && school.address.indexOf(form.address) === -1) {
+      return
+    }
+    result.push(school)
+  })
+  schoolData.value = result
+}
+
+onMounted(async () => {
+  schoolData.value = await fetchData()
+})
+
+const tryUpdateSchool = record => {
+  console.log(record)
+  schoolToUpdate.value = record
+  showUpdateModal.value = true
+}
+
+const toUpdateSchool = async (done) => {
+  await schoolEditor.value.submit()
+  await search()
+  done()
 }
 </script>
 
-<style scoped>
+<style scoped lang="less">
 
 </style>
