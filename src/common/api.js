@@ -35,11 +35,6 @@ export const addSchool = (data) => {
     return http.post(url, data)
 }
 
-export const addManager = (data) => {
-    const url = '/manager/addManager'
-    return http.post(url, data)
-}
-
 export const getCourses = (data) => {
     const url = '/manager/getCourses'
     return http.post(url, data)
@@ -85,4 +80,22 @@ export const updateSchool = (data) => {
     const url = '/manager/updateSchool'
     return http.post(url, data)
 }
+
+
+export const addManager = (data) => {
+    const url = '/manager/addManager'
+    return http.post(url, data)
+}
+
+export const allManager = () => {
+    const url = '/manager/allManager'
+    return http.post(url)
+}
+
+
+export const updateManager = (data) => {
+    const url = '/manager/updateManager'
+    return http.post(url, data)
+}
+
 
