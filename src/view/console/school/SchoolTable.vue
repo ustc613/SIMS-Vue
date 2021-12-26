@@ -30,6 +30,7 @@
         <a-table-column title="操作" align="center">
           <template #cell="{ record }">
             <a-button type="text" size="mini" @click="tryUpdateSchool(record)">更新信息</a-button>
+            <a-button type="text" size="mini" @click="tryFetchSchoolCourseGradeData(record)">查看成绩</a-button>
           </template>
         </a-table-column>
       </template>
@@ -44,13 +45,23 @@
         <SchoolEditor update-mode :form-data="schoolToUpdate" ref="schoolEditor"/>
       </div>
     </a-modal>
+
+    <a-modal v-model:visible="showSchoolCourseGradeModal" hide-cancel
+             :on-before-ok="toUpdateSchool">
+      <template #title>
+        学校课程平均分
+      </template>
+      <div>
+        <a-table :columns="courseGradeCols" :data="schoolCourseGradeData" :pagination="false"/>
+      </div>
+    </a-modal>
   </div>
 </template>
 
 <script setup>
 
 import { onMounted, reactive, ref } from "vue"
-import { getAllSchool } from "../../../common/api"
+import { getAllSchool, getCourses } from "../../../common/api"
 import SchoolEditor from "./SchoolEditor.vue"
 
 const columns = [
@@ -67,6 +78,22 @@ const columns = [
     dataIndex: 'address',
   }
 ]
+
+const courseGradeCols = [
+  {
+    title: '课程名',
+    dataIndex: 'name'
+  },
+  {
+    title: '任课教师',
+    dataIndex: 'teachername',
+  },
+  {
+    title: '平均分',
+    dataIndex: 'average',
+  }
+]
+
 const loading = ref(false)
 const form = reactive({
   name: null,
@@ -78,6 +105,9 @@ const schoolToUpdate = ref(null)
 
 const schoolData = ref([])
 const schoolEditor = ref(null)
+
+const showSchoolCourseGradeModal = ref(false)
+const schoolCourseGradeData = ref([])
 
 const fetchData = async () => {
   loading.value = true
@@ -115,6 +145,17 @@ const toUpdateSchool = async (done) => {
   await schoolEditor.value.submit()
   await search()
   done()
+}
+
+const tryFetchSchoolCourseGradeData = async record => {
+  showSchoolCourseGradeModal.value = true
+  schoolCourseGradeData.value = []
+  const res = await getCourses({
+    id: record.id
+  })
+  if (res) {
+    schoolCourseGradeData.value = res.rows
+  }
 }
 </script>
 

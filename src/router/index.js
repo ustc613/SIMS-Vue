@@ -12,7 +12,6 @@ router.beforeEach(((to, from, next) => {
     if (!from || to.path !== from.path) {
         if (loadingBarRef.value) {
             loadingBarRef.value.start()
-
         }
     }
     next()

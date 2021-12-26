@@ -13,6 +13,7 @@ import CourseEditor from "../view/console/course/CourseEditor.vue"
 import ManagerManagement from "../view/console/manager/ManagerManagement.vue"
 import ManagerTable from "../view/console/manager/ManagerTable.vue"
 import ManagerEditor from "../view/console/manager/ManagerEditor.vue"
+import Student from '../view/Student.vue'
 
 export default [
     {
@@ -99,5 +100,10 @@ export default [
                 ]
             },
         ]
+    },
+    {
+        path: '/student',
+        name: 'StudentInfo',
+        component: Student
     }
 ]

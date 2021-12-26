@@ -27,7 +27,7 @@ instance.interceptors.request.use(
 
         // 如果没有配置重新请求次数，设置默认为2
         if (config.retry === undefined) {
-            config.retry = 2
+            config.retry = 0
         } else {
             // 剩余重新请求次数减一
             config.retry -= 1

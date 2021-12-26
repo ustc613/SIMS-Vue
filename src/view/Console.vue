@@ -14,7 +14,7 @@
           :style="{ width: '100%' }"
           @sub-menu-click="onClickSubMenu"
           @menuItemClick="onClickMenuItem"
-          accordion
+          auto-open
       >
         <div v-for="menu in menuConfigs">
           <a-menu-item v-if="menu.children===undefined" :key="menu.text + '-' + menu.route">
@@ -52,9 +52,9 @@
         </a-row>
       </a-layout-header>
       <a-layout style="padding: 0 24px;">
-        <a-breadcrumb :style="{ margin: '16px 0' }">
-          <a-breadcrumb-item v-for="(bread,index) in breadcrumb" :key="index">{{ bread }}</a-breadcrumb-item>
-        </a-breadcrumb>
+        <!--        <a-breadcrumb :style="{ margin: '16px 0' }">-->
+        <!--          <a-breadcrumb-item v-for="(bread,index) in breadcrumb" :key="index">{{ bread }}</a-breadcrumb-item>-->
+        <!--        </a-breadcrumb>-->
         <a-layout-content>
           <router-view/>
         </a-layout-content>
@@ -73,11 +73,7 @@ import preference from "../common/preference"
 const collapsed = ref(false)
 const router = useRouter()
 
-const menuConfigs = [
-  {
-    text: '系统概览',
-    route: 'SystemOverview',
-  },
+const superMenuConfigs = [
   {
     text: '用户管理',
     children: [
@@ -110,6 +106,18 @@ const menuConfigs = [
       {
         text: '学生列表',
         route: 'StudentTable',
+      }
+    ]
+  }
+]
+
+const normalMenuConfigs = [
+  {
+    text: '学生管理',
+    children: [
+      {
+        text: '学生列表',
+        route: 'StudentTable',
       },
       {
         text: '添加学生',
@@ -130,22 +138,23 @@ const menuConfigs = [
       }
     ]
   },
-  {
-    text: '成绩管理',
-    children: [
-      {
-        text: '成绩列表',
-        route: '',
-      },
-      {
-        text: '录入成绩',
-        route: '',
-      }
-    ]
-  }
+  // {
+  //   text: '成绩管理',
+  //   children: [
+  //     {
+  //       text: '成绩列表',
+  //       route: '',
+  //     },
+  //     {
+  //       text: '录入成绩',
+  //       route: '',
+  //     }
+  //   ]
+  // }
 ]
 const breadcrumb = ref([ '系统概览' ])
 const manager = preference.get('manager')
+const menuConfigs = manager.role === 0 ? normalMenuConfigs : superMenuConfigs
 
 const onCollapse = () => {
   collapsed.value = !collapsed.value
@@ -217,6 +226,7 @@ const userLogout = async () => {
     background: var(--color-bg-3);
     //background-color: whitesmoke;
     padding: 12px;
+    margin-top: 24px;
   }
 
   :deep(.arco-layout-footer),

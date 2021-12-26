@@ -27,6 +27,7 @@
 import { reactive, watch } from "vue"
 import { addStudent, updateStudent } from "../../../common/api"
 import { Message } from "@arco-design/web-vue"
+import preference from "../../../common/preference"
 
 const props = defineProps({
   updateMode: {
@@ -45,20 +46,25 @@ const form = reactive({
 })
 
 const submit = async () => {
-  if (props.updateMode) {
-    const info = Object.assign(props.formData, form)
-    console.log(info)
-    const res = await updateStudent(info)
-    if (res && res.code === 200) {
-      Message.success(res.msg)
+  if (form.name) {
+    if (props.updateMode) {
+      const info = Object.assign(props.formData, form)
+      console.log(info)
+      const res = await updateStudent(info)
+      if (res && res.code === 200) {
+        Message.success(res.msg)
+      }
+    } else {
+      await addStudent({
+        name: form.name,
+        age: form.age,
+        sex: form.sex,
+        phone: form.phone,
+        schoolid: preference.get('manager').schoolid
+      })
     }
   } else {
-    await addStudent({
-      name: form.name,
-      age: form.age,
-      sex: form.sex,
-      phone: form.phone,
-    })
+    Message.error("学生姓名不能为空")
   }
 }
 

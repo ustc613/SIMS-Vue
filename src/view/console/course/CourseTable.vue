@@ -5,14 +5,8 @@
       <a-collapse-item header="条件查询" key="search">
         <a-form layout="vertical" :model="form">
 
-          <a-form-item v-if="manager.role===1" field="schoolName" label="选择学校">
-            <a-select placeholder="请选择学校查看..." v-model="form.schoolName" allow-clear style="text-align: left;">
-              <a-option v-for="school in schoolData">{{ school.name }}</a-option>
-            </a-select>
-          </a-form-item>
-
-          <a-form-item field="studentId" label="课程ID">
-            <a-input v-model="form.studentId" placeholder="请输入课程ID..."/>
+          <a-form-item field="studentId" label="课程名称">
+            <a-input v-model="form.courseName" placeholder="请输入课程名称..."/>
           </a-form-item>
 
           <a-form-item content-class="search-btn">
@@ -24,21 +18,43 @@
 
 
     <a-table
-        :columns="columns" :bordered="true" :hoverable="true" :stripe="true"
-        :loading="false" :show-header="true" page-position="bottom"
+        :bordered="true" :hoverable="true" :stripe="true"
+        :loading="loading" :show-header="true" page-position="bottom"
         :row-selection="{
           type: 'checkbox',
           showCheckedAll: true
         }"
         :data="courseData" row-key="id"
-    />
+    >
+      <template #columns>
+        <a-table-column v-for="col in columns" :title="col.title" :data-index="col.dataIndex" :sortable="col.sortable"/>
+        <a-table-column title="操作" align="center">
+          <template #cell="{ record }">
+            <a-button type="text" size="mini"
+                      @click="tryUpdateCourse(record)">更新
+            </a-button>
+          </template>
+        </a-table-column>
+
+      </template>
+    </a-table>
   </div>
+  <a-modal v-model:visible="showUpdateModal" hide-cancel
+           :on-before-ok="toUpdateSCourse">
+    <template #title>
+      更新课程信息
+    </template>
+    <div>
+      <CourseEditor update-mode :form-data="courseToOperate" ref="courseEditor"/>
+    </div>
+  </a-modal>
 </template>
 
 <script setup>
 import { onMounted, reactive, ref, watch } from "vue"
 import { allCourse, allStudent, getAllSchool, superManagerAllCourse, superManagerAllStudent } from "../../../common/api"
 import preference from "../../../common/preference"
+import CourseEditor from "./CourseEditor.vue"
 
 const columns = [
   {
@@ -57,8 +73,7 @@ const columns = [
 
 const loading = ref(false)
 const form = reactive({
-  schoolName: null,
-  courseId: null,
+  courseName: null,
 })
 
 const manager = preference.get('manager')
@@ -66,6 +81,9 @@ const courseData = ref([])
 
 const schoolData = ref([])
 const selectedSchoolId = ref(-1)
+const courseToOperate = ref({})
+const showUpdateModal = ref(false)
+const courseEditor = ref(null)
 
 const fetchData = async () => {
   loading.value = true
@@ -80,19 +98,11 @@ const fetchData = async () => {
   return res.rows
 }
 
-const fetchSchoolData = async () => {
-  const res = await getAllSchool()
-  schoolData.value = res.rows
-}
-
 const search = async () => {
   const courses = await fetchData()
   const result = []
   courses.forEach((course) => {
-    if (selectedSchoolId.value !== -1 && course.schoolid !== selectedSchoolId.value) {
-      return
-    }
-    if (form.courseId && form.courseId !== course.id.toString()) {
+    if (form.courseName && course.name.indexOf(form.courseName) === -1) {
       return
     }
     result.push(course)
@@ -110,8 +120,19 @@ watch(() => form.schoolName, (val) => {
 
 onMounted(async () => {
   courseData.value = await fetchData()
-  fetchSchoolData()
 })
+
+const tryUpdateCourse = student => {
+  console.log(student)
+  courseToOperate.value = student
+  showUpdateModal.value = true
+}
+const toUpdateSCourse = async (done) => {
+  await courseEditor.value.submit()
+  await search()
+  done()
+}
+
 </script>
 
 <style scoped>

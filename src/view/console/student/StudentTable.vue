@@ -35,7 +35,7 @@
         :data="studentData" row-key="id"
     >
       <template #columns>
-        <a-table-column v-for="col in columns" :title="col.title" :data-index="col.dataIndex"/>
+        <a-table-column v-for="col in columns" :title="col.title" :data-index="col.dataIndex" :sortable="col.sortable"/>
         <a-table-column title="操作" align="center">
           <template #cell="{ record }">
             <a-button type="text" size="mini"
@@ -83,10 +83,9 @@ const columns = [
   {
     title: '学生ID',
     dataIndex: 'id',
-  },
-  {
-    title: '学校ID',
-    dataIndex: 'id',
+    sortable: {
+      sortDirections: [ 'ascend', 'descend']
+    }
   },
   {
     title: '姓名',
@@ -119,6 +118,13 @@ const showDeleteModal = ref(false)
 
 const manager = preference.get('manager')
 const studentData = ref([])
+
+if (manager.role === 1) {
+  columns.splice(1, 0, {
+    title: '学校ID',
+    dataIndex: 'schoolid',
+  })
+}
 
 const schoolData = ref([])
 const selectedSchoolId = ref(-1)
@@ -167,7 +173,9 @@ watch(() => form.schoolName, (val) => {
 
 onMounted(async () => {
   studentData.value = await fetchData()
-  fetchSchoolData()
+  if (manager.role === 1) {
+    fetchSchoolData()
+  }
 })
 
 const tryUpdateStudent = student => {
@@ -188,6 +196,7 @@ const tryDeleteStudent = async student => {
 
 const toDeleteStudent = async (done) => {
   await deleteStudent(studentToOperate.value)
+  await search()
   done()
 }
 </script>

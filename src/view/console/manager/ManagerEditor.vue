@@ -75,7 +75,7 @@ watch(() => form.schoolName, val => {
 })
 
 const submit = async () => {
-  if (form.name && form.schoolName) {
+  if (form.name && form.username && form.password) {
     let res
     const commonData = {
       name: form.name,
@@ -103,7 +103,7 @@ const submit = async () => {
       }
     }
   } else {
-    Message.error("学校名和地址不能为空")
+    Message.error("姓名、用户名以及密码不能为空")
   }
 }
 

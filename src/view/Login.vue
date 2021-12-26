@@ -8,7 +8,7 @@
         </a-radio-group>
       </div>
       <h1 class="login-title">
-        {{ userType === 'admin' ? '管理员登录' : '学生登录' }}
+        {{ userType === 'manager' ? '管理员登录' : '学生登录' }}
       </h1>
       <a-form :model="loginInfo" class="login-form" :wrapper-col-props="rolProps">
         <a-form-item field="username" hide-label>
@@ -55,10 +55,14 @@ const onClickLogin = async () => {
     if (res) {
       if (res.code === 200) {
         if (userType.value === 'student') {
-
+          await router.push({ name: 'StudentInfo' })
         } else {
           preference.set('manager', res.data)
-          await router.replace({ name: 'SystemOverview' })
+          if(res.data.role===1){
+            await router.push({ name: 'SchoolTable' })
+          }else{
+            await router.push({ name: 'StudentTable' })
+          }
         }
       } else {
         Message.error(res.msg)

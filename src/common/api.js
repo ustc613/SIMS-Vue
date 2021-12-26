@@ -98,4 +98,17 @@ export const updateManager = (data) => {
     return http.post(url, data)
 }
 
+export const updateCourse = (data) => {
+    const url = '/manager/updateCourse'
+    return http.post(url, data)
+}
 
+export const addCourse = (data) => {
+    const url = '/manager/addCourse'
+    return http.post(url, data)
+}
+
+export const getStudentInfo = (data) => {
+    const url = '/student/personal'
+    return http.post(url, data)
+}
