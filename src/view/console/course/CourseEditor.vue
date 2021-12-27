@@ -20,6 +20,7 @@ import { reactive, watch } from "vue"
 import { addCourse, addStudent, updateCourse, updateStudent } from "../../../common/api"
 import { Message } from "@arco-design/web-vue"
 import preference from "../../../common/preference"
+import { useRouter } from "vue-router"
 
 const props = defineProps({
   updateMode: {
@@ -29,7 +30,7 @@ const props = defineProps({
   formData: Object,
 })
 
-
+const router = useRouter()
 const form = reactive({
   name: null,
   teachername: null,
@@ -37,19 +38,28 @@ const form = reactive({
 
 const submit = async () => {
   if (form.name && form.teachername) {
+    let res
     if (props.updateMode) {
       const info = Object.assign(props.formData, form)
       console.log(info)
-      const res = await updateCourse(info)
+      res = await updateCourse(info)
       if (res && res.code === 200) {
         Message.success(res.msg)
       }
     } else {
-      await addCourse({
+      res = await addCourse({
         name: form.name,
         teachername: form.teachername,
         schoolid: preference.get('manager').schoolid
       })
+    }
+    if (res) {
+      if (res.code === 200) {
+        Message.success(res.msg)
+        await router.replace({ name: 'CourseTable' })
+      } else {
+        Message.error(res.msg)
+      }
     }
   } else {
     Message.error("课程名和任课教师不能为空")

@@ -28,7 +28,9 @@ import { reactive, watch } from "vue"
 import { addStudent, updateStudent } from "../../../common/api"
 import { Message } from "@arco-design/web-vue"
 import preference from "../../../common/preference"
+import { useRouter } from "vue-router"
 
+const router = useRouter()
 const props = defineProps({
   updateMode: {
     type: Boolean,
@@ -47,21 +49,30 @@ const form = reactive({
 
 const submit = async () => {
   if (form.name) {
+    let res
     if (props.updateMode) {
       const info = Object.assign(props.formData, form)
       console.log(info)
-      const res = await updateStudent(info)
+      res = await updateStudent(info)
       if (res && res.code === 200) {
         Message.success(res.msg)
       }
     } else {
-      await addStudent({
+      res = await addStudent({
         name: form.name,
         age: form.age,
         sex: form.sex,
         phone: form.phone,
         schoolid: preference.get('manager').schoolid
       })
+    }
+    if (res) {
+      if (res.code === 200) {
+        Message.success(res.msg)
+        await router.replace({ name: 'StudentTable' })
+      } else {
+        Message.error(res.msg)
+      }
     }
   } else {
     Message.error("学生姓名不能为空")
