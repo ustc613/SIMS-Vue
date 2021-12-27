@@ -68,6 +68,10 @@ const columns = [
   {
     title: '任课教师',
     dataIndex: 'teachername',
+  },
+  {
+    title: '平均分',
+    dataIndex: 'average',
   }
 ]
 

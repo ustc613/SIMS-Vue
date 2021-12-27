@@ -9,7 +9,7 @@ const instance = Axios.create({
 
 // 设置post请求头
 instance.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded;charset=UTF-8'
-const baseURL = import.meta.env.MODE === 'production' ? 'https://sims.sudocs.com' : 'http://localhost:8080'
+const baseURL = import.meta.env.MODE === 'production' ? 'https://sims-api.sudocs.com' : 'http://localhost:8080'
 instance.defaults.baseURL = baseURL
 
 // 设置超时时间

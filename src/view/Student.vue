@@ -14,21 +14,25 @@
 
     <a-space/>
 
-    <a-card title="课程成绩" bordered>
-      <a-card-grid
-          v-for="(course, index) in courses"
-          :key="index"
-          :hoverable="index % 2 === 0"
-          :style="{ width: '25%' }"
-      >
-        <a-card :title="course.coursename" :bordered="false">
-          <p :style="{ margin: 0 }">
-            成绩：{{ course.grade }}
-          </p>
-        </a-card>
-      </a-card-grid>
-    </a-card>
+    <!--    <a-card title="课程成绩" bordered>-->
+    <!--      <a-card-grid-->
+    <!--          v-for="(course, index) in courses"-->
+    <!--          :key="index"-->
+    <!--          :hoverable="index % 2 === 0"-->
+    <!--          :style="{ width: '25%' }"-->
+    <!--      >-->
+    <!--        <a-card :title="course.coursename" :bordered="false">-->
+    <!--          <p :style="{ margin: 0 }">-->
+    <!--            成绩：{{ course.grade }}-->
+    <!--          </p>-->
+    <!--        </a-card>-->
+    <!--      </a-card-grid>-->
+    <!--    </a-card>-->
 
+    <div class="grade-info">
+      <a-table :columns="columns" :data="courses" :pagination="false" :stripe="true"/>
+      <a-alert> 平均成绩 {{ average }}</a-alert>
+    </div>
   </div>
 </template>
 
@@ -37,7 +41,7 @@ import { onMounted, ref } from "vue"
 import { getStudentInfo } from "../common/api"
 
 const studentInfo = ref({})
-const courses = ref({})
+const courses = ref([])
 const infoData = ref([])
 
 const fetchData = async () => {
@@ -55,6 +59,18 @@ const keyToLabel = {
   schoolname: '所在学校'
 }
 
+const columns = [
+  {
+    title: '课程名称',
+    dataIndex: 'coursename',
+  },
+  {
+    title: '成绩',
+    dataIndex: 'grade',
+  }
+]
+
+const average = ref(0)
 onMounted(async () => {
   const res = await fetchData()
   if (res) {
@@ -70,6 +86,11 @@ onMounted(async () => {
         })
       }
     })
+    let sum = 0
+    courses.value.forEach(c => {
+      sum += c.grade
+    })
+    average.value = sum / courses.value.length
   }
 })
 </script>
@@ -80,7 +101,7 @@ onMounted(async () => {
   margin: 0 auto;
   padding: 24px;
 
-  @border: 8px;
+  @border: 6px;
 
   .info-card {
     display: flex;
@@ -102,6 +123,13 @@ onMounted(async () => {
       border-top-left-radius: @border;
       border-bottom-left-radius: @border;
     }
+  }
+
+  .grade-info{
+    background-color: white;
+    padding: 12px;
+    border: @border;
+    border: 1px solid rgba(black, .05);
   }
 }
 </style>

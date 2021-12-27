@@ -105,6 +105,12 @@ const onClickLogin = async () => {
     .login-form {
       width: 480px;
     }
+
+    @media(max-width: 768px){
+      .login-form {
+        width: 240px;
+      }
+    }
   }
 }
 </style>
